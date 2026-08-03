@@ -90,7 +90,7 @@ namespace FruitNinja
         private void Update()
         {
             Transform trackingTransform = wholeFruit != null ? wholeFruit.transform : transform;
-            if (trackingTransform.position.y < -10f)
+            if (trackingTransform.position.y < -70f)
             {
                 Destroy(gameObject);
             }
