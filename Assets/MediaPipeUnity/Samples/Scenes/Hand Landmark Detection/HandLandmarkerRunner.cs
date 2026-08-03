@@ -15,6 +15,8 @@ namespace Mediapipe.Unity.Sample.HandLandmarkDetection
   {
     [SerializeField] private HandLandmarkerResultAnnotationController _handLandmarkerResultAnnotationController;
 
+    public static event System.Action<HandLandmarkerResult> OnHandLandmarkDetected;
+
     private Experimental.TextureFramePool _textureFramePool;
 
     public readonly HandLandmarkDetectionConfig config = new HandLandmarkDetectionConfig();
@@ -128,6 +130,7 @@ namespace Mediapipe.Unity.Sample.HandLandmarkDetection
             if (taskApi.TryDetect(image, imageProcessingOptions, ref result))
             {
               _handLandmarkerResultAnnotationController.DrawNow(result);
+              OnHandLandmarkDetected?.Invoke(result);
             }
             else
             {
@@ -138,6 +141,7 @@ namespace Mediapipe.Unity.Sample.HandLandmarkDetection
             if (taskApi.TryDetectForVideo(image, GetCurrentTimestampMillisec(), imageProcessingOptions, ref result))
             {
               _handLandmarkerResultAnnotationController.DrawNow(result);
+              OnHandLandmarkDetected?.Invoke(result);
             }
             else
             {
@@ -154,6 +158,7 @@ namespace Mediapipe.Unity.Sample.HandLandmarkDetection
     private void OnHandLandmarkDetectionOutput(HandLandmarkerResult result, Image image, long timestamp)
     {
       _handLandmarkerResultAnnotationController.DrawLater(result);
+      OnHandLandmarkDetected?.Invoke(result);
     }
   }
 }
