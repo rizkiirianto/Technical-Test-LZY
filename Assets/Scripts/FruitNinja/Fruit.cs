@@ -6,6 +6,7 @@ namespace FruitNinja
     {
         public GameObject wholeFruit;
         public GameObject slicedFruitObject; // Drag the sliced child object here
+        public bool isBomb = false;
         public int points = 1;
         private Rigidbody rb;
         private bool isSliced = false;
@@ -37,8 +38,16 @@ namespace FruitNinja
 
             if (GameManager.Instance != null)
             {
-                GameManager.Instance.AddScore(points);
-                GameManager.Instance.TriggerHitImpact();
+                if (isBomb)
+                {
+                    GameManager.Instance.AddScore(-1); // Atau -points, tapi Anda minta -1
+                    GameManager.Instance.TriggerBombImpact();
+                }
+                else
+                {
+                    GameManager.Instance.AddScore(points);
+                    GameManager.Instance.TriggerHitImpact();
+                }
             }
             else
             {

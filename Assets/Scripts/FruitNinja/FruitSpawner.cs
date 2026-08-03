@@ -6,6 +6,8 @@ namespace FruitNinja
     public class FruitSpawner : MonoBehaviour
     {
         public GameObject[] fruitPrefabs;
+        public GameObject[] bombPrefabs;
+        public float bombChance = 0.5f;
         public float spawnDelay = 1f;
 
         private void Start()
@@ -27,7 +29,17 @@ namespace FruitNinja
 
                 Vector3 spawnPosition = transform.position + new Vector3(randomX, 0f, 0f);
 
-                GameObject prefab = fruitPrefabs[Random.Range(0, fruitPrefabs.Length)];
+                GameObject prefab = null;
+                // Check if we should spawn a bomb
+                if (bombPrefabs != null && bombPrefabs.Length > 0 && Random.value < bombChance)
+                {
+                    prefab = bombPrefabs[Random.Range(0, bombPrefabs.Length)];
+                }
+                else
+                {
+                    prefab = fruitPrefabs[Random.Range(0, fruitPrefabs.Length)];
+                }
+
                 GameObject spawnedFruit = Instantiate(prefab, spawnPosition, Quaternion.identity);
 
                 Rigidbody rb = spawnedFruit.GetComponent<Rigidbody>();

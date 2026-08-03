@@ -119,7 +119,7 @@ namespace FruitNinja
 
             // Start laser slightly in front of the camera so it doesn't clip
             Vector3 laserStart = ray.origin + ray.direction * 1f;
-            laserStart.y -= 2f; // Offset it slightly down so it looks like it comes from the bottom of the screen
+            laserStart.y -= 1f; // Offset it slightly down so it looks like it comes from the bottom of the screen
             Vector3 laserEnd = ray.origin + ray.direction * 50f;
 
             // SphereCast gives a thicker beam than Raycast, making it easier to aim and hit

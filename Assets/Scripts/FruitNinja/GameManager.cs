@@ -11,6 +11,7 @@ namespace FruitNinja
 
         public int score;
         public TextMeshProUGUI scoreText;
+        public Image damageOverlay;
 
         // Game Feel variables
         private Vector3 originalCameraPos;
@@ -39,6 +40,19 @@ namespace FruitNinja
             {
                 scoreText.text = "Score: " + score;
             }
+        }
+
+        public void TriggerBombImpact()
+        {
+            // Camera Shake lebih hebat untuk bom
+            if (Camera.main != null)
+            {
+                if (shakeCoroutine != null) StopCoroutine(shakeCoroutine);
+                shakeCoroutine = StartCoroutine(ShakeRoutine(0.3f, 1.5f));
+            }
+
+            // Layar Merah
+            StartCoroutine(BombImpactRoutine());
         }
 
         public void TriggerHitImpact()
@@ -78,6 +92,30 @@ namespace FruitNinja
             }
 
             camTransform.localPosition = originalCameraPos;
+        }
+
+        private IEnumerator BombImpactRoutine()
+        {
+            if (damageOverlay != null)
+            {
+                Color c = damageOverlay.color;
+                
+                // Flash (50% opacity)
+                damageOverlay.color = new Color(c.r, c.g, c.b, 0.5f);
+                
+                // Fade out smoothly
+                float elapsed = 0f;
+                float duration = 0.5f; // 0.5 detik
+                while (elapsed < duration)
+                {
+                    elapsed += Time.unscaledDeltaTime;
+                    float alpha = Mathf.Lerp(0.5f, 0f, elapsed / duration);
+                    damageOverlay.color = new Color(c.r, c.g, c.b, alpha);
+                    yield return null;
+                }
+                
+                damageOverlay.color = new Color(c.r, c.g, c.b, 0f);
+            }
         }
 
         public void GameOver()
