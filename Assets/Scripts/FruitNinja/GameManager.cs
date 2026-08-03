@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 namespace FruitNinja
 {
@@ -11,7 +12,12 @@ namespace FruitNinja
 
         public int score;
         public TextMeshProUGUI scoreText;
+        public int hp = 100;
+        public TextMeshProUGUI hpText;
         public Image damageOverlay;
+        public GameObject gameOverPanel;
+
+        private bool isGameOver = false;
 
         // Game Feel variables
         private Vector3 originalCameraPos;
@@ -26,6 +32,9 @@ namespace FruitNinja
                 {
                     originalCameraPos = Camera.main.transform.localPosition;
                 }
+
+                if (hpText != null) hpText.text = "HP: " + hp;
+                if (gameOverPanel != null) gameOverPanel.SetActive(false);
             }
             else
             {
@@ -44,6 +53,14 @@ namespace FruitNinja
 
         public void TriggerBombImpact()
         {
+            if (isGameOver) return;
+
+            // Kurangi HP
+            hp -= 25;
+            if (hp <= 0) hp = 0;
+
+            if (hpText != null) hpText.text = "HP: " + hp;
+
             // Camera Shake lebih hebat untuk bom
             if (Camera.main != null)
             {
@@ -53,6 +70,11 @@ namespace FruitNinja
 
             // Layar Merah
             StartCoroutine(BombImpactRoutine());
+
+            if (hp <= 0)
+            {
+                GameOver();
+            }
         }
 
         public void TriggerHitImpact()
@@ -99,10 +121,10 @@ namespace FruitNinja
             if (damageOverlay != null)
             {
                 Color c = damageOverlay.color;
-                
+
                 // Flash (50% opacity)
                 damageOverlay.color = new Color(c.r, c.g, c.b, 0.5f);
-                
+
                 // Fade out smoothly
                 float elapsed = 0f;
                 float duration = 0.5f; // 0.5 detik
@@ -113,14 +135,40 @@ namespace FruitNinja
                     damageOverlay.color = new Color(c.r, c.g, c.b, alpha);
                     yield return null;
                 }
-                
+
                 damageOverlay.color = new Color(c.r, c.g, c.b, 0f);
             }
         }
 
         public void GameOver()
         {
-            Debug.Log("Game Over!");
+            if (isGameOver) return;
+            isGameOver = true;
+            Debug.Log("Game Over! HP habis.");
+
+            // Matikan gameplay dengan membekukan waktu
+            Time.timeScale = 0f;
+
+            // Tampilkan panel Game Over
+            if (gameOverPanel != null)
+            {
+                gameOverPanel.SetActive(true);
+            }
+
+            // Mulai penghitung waktu mundur 5 detik
+            StartCoroutine(GameOverRoutine());
+        }
+
+        private IEnumerator GameOverRoutine()
+        {
+            // Menggunakan Realtime karena Time.timeScale sekarang 0
+            yield return new WaitForSecondsRealtime(5f);
+
+            // Kembalikan waktu ke normal sebelum memuat scene baru
+            Time.timeScale = 1f;
+
+            // Kembali ke Main Menu (Pastikan nama Scene Main Menu Anda sesuai)
+            SceneManager.LoadScene("Scenes/MainMenu");
         }
     }
 }

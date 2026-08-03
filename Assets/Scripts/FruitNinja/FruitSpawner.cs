@@ -7,19 +7,35 @@ namespace FruitNinja
     {
         public GameObject[] fruitPrefabs;
         public GameObject[] bombPrefabs;
-        public float bombChance = 0.5f;
-        public float spawnDelay = 1f;
+        public float bombChance = 0.3f;
+        
+        [Header("Progression System")]
+        public float spawnDelay = 1.5f; // Initial delay
+        public float minSpawnDelay = 0.15f; // Bisa sangat cepat (0.15 detik)
+        public float delayDecreaseRate = 0.02f; // Jeda berkurang 0.02 detik setiap 1 detik waktu bermain
+
+        private float timeElapsed = 0f;
 
         private void Start()
         {
+            timeElapsed = 0f;
             StartCoroutine(SpawnFruits());
+        }
+
+        private void Update()
+        {
+            // Catat waktu bermain secara terus-menerus
+            timeElapsed += Time.deltaTime;
         }
 
         private IEnumerator SpawnFruits()
         {
             while (true)
             {
-                yield return new WaitForSeconds(spawnDelay);
+                // Kalkulasi tingkat kesulitan
+                float currentDelay = Mathf.Max(minSpawnDelay, spawnDelay - (timeElapsed * delayDecreaseRate));
+
+                yield return new WaitForSeconds(currentDelay);
 
                 if (fruitPrefabs.Length == 0) continue;
 
@@ -47,8 +63,11 @@ namespace FruitNinja
 
                 if (rb != null)
                 {
-                    // No upward force, just let gravity pull it down!
-                    // But we can add a little bit of random rotation (torque) so it spins beautifully as it falls
+                    // Add slight random velocity so they don't fall perfectly straight
+                    Vector3 randomVelocity = new Vector3(Random.Range(-2f, 2f), 0f, Random.Range(-1f, 1f));
+                    rb.linearVelocity = randomVelocity;
+                    
+                    // Add a little bit of random rotation (torque) so it spins beautifully as it falls
                     rb.AddTorque(Random.insideUnitSphere * Random.Range(2f, 5f), ForceMode.Impulse);
                 }
             }
