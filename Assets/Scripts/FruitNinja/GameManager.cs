@@ -16,6 +16,11 @@ namespace FruitNinja
         public TextMeshProUGUI hpText;
         public Image damageOverlay;
         public GameObject gameOverPanel;
+        
+        [Header("Audio SFX")]
+        public AudioSource sfxSource;
+        public AudioClip fruitHitSound;
+        public AudioClip bombHitSound;
 
         private bool isGameOver = false;
 
@@ -70,6 +75,12 @@ namespace FruitNinja
 
             // Layar Merah
             StartCoroutine(BombImpactRoutine());
+            
+            // SFX Bomb
+            if (sfxSource != null && bombHitSound != null)
+            {
+                sfxSource.PlayOneShot(bombHitSound);
+            }
 
             if (hp <= 0)
             {
@@ -87,6 +98,12 @@ namespace FruitNinja
             {
                 if (shakeCoroutine != null) StopCoroutine(shakeCoroutine);
                 shakeCoroutine = StartCoroutine(ShakeRoutine(0.2f, 1.0f));
+            }
+            
+            // SFX Fruit
+            if (sfxSource != null && fruitHitSound != null)
+            {
+                sfxSource.PlayOneShot(fruitHitSound);
             }
         }
 
