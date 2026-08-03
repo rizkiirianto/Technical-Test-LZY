@@ -58,8 +58,8 @@ namespace FruitNinja
                 var hand = result.handLandmarks[0];
                 if (hand.landmarks != null && hand.landmarks.Count > 20)
                 {
-                    // Gunakan ujung telunjuk (8) untuk membidik
-                    var indexFingerTip = hand.landmarks[8];
+                    // Gunakan pangkal jari tengah (Middle Finger MCP - titik 9) untuk membidik di Main Menu.
+                    var aimPoint = hand.landmarks[9];
 
                     // Deteksi Kepalan Tangan (Fist)
                     // Cek jarak ujung jari tengah (12), manis (16), dan kelingking (20) terhadap pergelangan tangan (0)
@@ -76,16 +76,16 @@ namespace FruitNinja
                     // Jika ketiga jari tersebut melipat ke dekat pergelangan tangan, itu adalah gestur kepal (fist)
                     isFist = (midDist < fistThreshold && ringDist < fistThreshold && pinkyDist < fistThreshold);
 
-                    // Get raw coordinates (untuk aiming)
-                    float rawX = mirrorX ? (1.0f - indexFingerTip.x) : indexFingerTip.x;
-                    float rawY = 1.0f - indexFingerTip.y;
+                    // Get raw coordinates (untuk aiming) menggunakan telapak tangan
+                    float rawX = mirrorX ? (1.0f - aimPoint.x) : aimPoint.x;
+                    float rawY = 1.0f - aimPoint.y;
 
                     // Apply sensitivity from the center (0.5, 0.5)
                     float x = 0.5f + ((rawX - 0.5f) * sensitivity);
                     float y = 0.5f + ((rawY - 0.5f) * sensitivity);
 
                     hasNewDetection = true;
-                    
+
                     // PENTING: Kunci (freeze) posisi bidikan jika sedang mengepal!
                     // Ini mencegah laser meleset/memendek akibat ujung jari ikut tertekuk saat mengepal.
                     if (!isFist)
@@ -162,7 +162,7 @@ namespace FruitNinja
                     targetBtn = res.gameObject.GetComponentInParent<Button>();
                     if (targetBtn != null) break;
                 }
-                
+
                 if (targetBtn != null)
                 {
                     // Deteksi Klik: Jika SEKARANG mengepal, dan SEBELUMNYA tidak mengepal (OnKeyDown)
